@@ -33,6 +33,13 @@ class BasicDataset(Dataset):
         pil_img = pil_img.resize((newW, newH), resample=Image.NEAREST if is_mask else Image.BICUBIC)
         img_ndarray = np.asarray(pil_img)
 
+        # '''
+        # If we have a 1 channel mask we copy into three dimensions to avoid errors.
+        #      '''
+        # if(len(img_ndarray.shape)==2):
+        #     #img_ndarray=np.dstack([img_ndarray]*3)
+        #     img_ndarray= img_ndarray[:, :, None] * np.ones(3, dtype=int)[None, None, :]
+
         if not is_mask:
             if img_ndarray.ndim == 2:
                 img_ndarray = img_ndarray[np.newaxis, ...]
@@ -62,7 +69,7 @@ class BasicDataset(Dataset):
         assert len(mask_file) == 1, f'Either no mask or multiple masks found for the ID {name}: {mask_file}'
         mask = self.load(mask_file[0])
         img = self.load(img_file[0])
-
+        assert img.mode =="RGB", "file {} is not rgb".format(img.filename)
         assert img.size == mask.size, \
             f'Image and mask {name} should be the same size, but are {img.size} and {mask.size}'
 
@@ -77,4 +84,4 @@ class BasicDataset(Dataset):
 
 class CarvanaDataset(BasicDataset):
     def __init__(self, images_dir, masks_dir, scale=1):
-        super().__init__(images_dir, masks_dir, scale, mask_suffix='_mask')
+        super().__init__(images_dir, masks_dir, scale, mask_suffix='')

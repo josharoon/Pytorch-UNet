@@ -16,10 +16,11 @@ from utils.data_loading import BasicDataset, CarvanaDataset
 from utils.dice_score import dice_loss
 from evaluate import evaluate
 from unet import UNet
+from hrnet import seg_hrnet
 
-dir_img = Path('./data/data3/imgs/')
-dir_mask = Path('./data/data3/masks/')
-dir_checkpoint = Path('./checkpointsExt2/')
+dir_img = Path('./data/data2/imgs/')
+dir_mask = Path('./data/data2/masks/')
+dir_checkpoint = Path('./checkpointsHRnetExt1/')
 EPOCH_PATTERN=r"(\d{1,4})(.pth)"
 def getEpoch(path):
     epoch = re.search(EPOCH_PATTERN, path).group(1)
@@ -57,7 +58,7 @@ def train_net(net,
     val_loader = DataLoader(val_set, shuffle=False, drop_last=True, **loader_args)
 
     # (Initialize logging)
-    experiment = wandb.init(project='U-Net', resume='allow', anonymous='must')
+    experiment = wandb.init(project='hrNet', resume='allow', anonymous='must')
     experiment.config.update(dict(epochs=epochs, batch_size=batch_size, learning_rate=learning_rate,
                                   val_percent=val_percent, save_checkpoint=save_checkpoint, img_scale=img_scale,
                                   amp=amp))
@@ -184,7 +185,8 @@ if __name__ == '__main__':
     # Change here to adapt to your data
     # n_channels=3 for RGB images
     # n_classes is the number of probabilities you want to get per pixel
-    net = UNet(n_channels=3, n_classes=args.classes, bilinear=args.bilinear)
+    #net = UNet(n_channels=3, n_classes=args.classes, bilinear=args.bilinear)
+    net=seg_hrnet.
 
     logging.info(f'Network:\n'
                  f'\t{net.n_channels} input channels\n'
